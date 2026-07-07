@@ -12,14 +12,15 @@ class Lamp {
     }
 
     void setColor(u8_t r, u8_t g, u8_t b) {
-      //led.setPixelColor(0, led.Color(r, g, b));
       led.fill(led.Color(r, g, b));
       led.show();
+      actor.setCurrentRGBColor({r, g, b});
     }
 
     void setBrightness(uint8_t brightness) {
       led.setBrightness(brightness);
       led.show();
+      actor.setBrightness(brightness);
     }
 //HADevice* device, 
     Lamp(const char* name, const char* id, int pin, int numberOfLEDs)
@@ -65,14 +66,10 @@ class Lamp {
 
       lamps[sender]->setBrightness(brightness);
       lamps[sender]->forceLedUpdate();
-
-      sender->setBrightness(brightness); // report brightness back to the Home Assistant
     }
 
     static void onRGBColorCommand(HALight::RGBColor color, HALight *sender) {
       lamps[sender]->setColor(color.red, color.green, color.blue);
-
-      sender->setRGBColor(color); // report color back to the Home Assistant
     }
 };
 
