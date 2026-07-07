@@ -2,11 +2,11 @@
 #include <HAMqtt.h>
 #include <string>
 
-const char* EVENT_NAMES[] = {"winter", "shower", "summer"};
+const char* EVENT_NAMES[] = {"winter", "night", "summer"};
 
 enum events {
 	SIM_WINTER,
-	SIM_SHOWER,
+	SIM_NIGHT,
 	SIM_SUMMER,
 	EVENTS_LENGTH
 };
