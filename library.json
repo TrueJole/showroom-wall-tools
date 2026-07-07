@@ -1,6 +1,6 @@
 {
   "name": "Showroom Wall Tools",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "A list of wrappers and helper classes to unify the code of multiple ESP32s for an internship.",
   "repository":
   {
@@ -15,7 +15,10 @@
     }
   ],
   "dependencies": {
-    "home-assistant-integration": "2.1.0"
+    "dawidchyrzynski/home-assistant-integration": "2.1.0",
+    "adafruit/Adafruit NeoPixel": "1.15.5",
+    "madhephaestus/ESP32Servo": "3.2.1",
+    "adafruit/DHT sensor library": "1.4.7"
   },
   "frameworks": "arduino",
   "platforms": "*"
