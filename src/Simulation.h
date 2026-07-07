@@ -28,12 +28,10 @@ public:
 
 	void simulationSetup() {
 		for (int i = 0; i < EVENTS_LENGTH; i++) {
-			//Serial.println(strcat(strdup("simulated/"), strdup(EVENT_NAMES[i])));
 			std::string topic = std::string("simulated/") + EVENT_NAMES[i];
 			mqtt->subscribe(topic.c_str());
 		}
 		Serial.println("Simulation - Setup complete");
-		//mqtt->subscribe("simulated/winter");
 	}
 
 	void handleSimulation(const char *topic, const uint8_t *payload, uint16_t length) {
@@ -48,23 +46,13 @@ public:
 		Serial.println((const char *)payload_data);
 
 		for (int i = 0; i < EVENTS_LENGTH; i++) {
-			//Serial.print("Simulation - Comparing to ");
-			//Serial.println(strcat(strdup("simulated/"), strdup(EVENT_NAMES[i])));
 			std::string event = std::string("simulated/") + EVENT_NAMES[i];
 			if (strcmp(topic, event.c_str()) == 0) {
-				//Serial.println("Found topic!");
 				if (strcmp(payload_data, "ON") == 0) {
-					//Serial.print("Simulation - ");
-					//Serial.print(EVENT_NAMES[i]);
-					//Serial.println(" on");
-					//Serial.print("Storing in element ");
-					//Serial.println(i);
 					eventStatus[i] = true;
 					eventStart[i] = millis();
-				} else {
-					//Serial.print("Simulation - ");
-					//Serial.print(EVENT_NAMES[i]);
-					//Serial.println(" off");
+				} 
+				else {
 					eventStatus[i] = false;
 				}
 				Serial.println("Simulation - Message handled!");
