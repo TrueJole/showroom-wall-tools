@@ -1,93 +1,176 @@
-# Simulation Library
+# Showroom Wall Tools
 
-
-
-## Getting started
-
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
-
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
-
-## Add your files
-
-* [Create](https://docs.gitlab.com/user/project/repository/web_editor/#create-a-file) or [upload](https://docs.gitlab.com/user/project/repository/web_editor/#upload-a-file) files
-* [Add files using the command line](https://docs.gitlab.com/topics/git/add_files/#add-files-to-a-git-repository) or push an existing Git repository with the following command:
-
-```
-cd existing_repo
-git remote add origin https://git.th-wildau.de/roboticlab-telematik/praktikasose26/smarthomewand/simulation-library.git
-git branch -M main
-git push -uf origin main
-```
-
-## Integrate with your tools
-
-* [Set up project integrations](https://git.th-wildau.de/roboticlab-telematik/praktikasose26/smarthomewand/simulation-library/-/settings/integrations)
-
-## Collaborate with your team
-
-* [Invite team members and collaborators](https://docs.gitlab.com/user/project/members/)
-* [Create a new merge request](https://docs.gitlab.com/user/project/merge_requests/creating_merge_requests/)
-* [Automatically close issues from merge requests](https://docs.gitlab.com/user/project/issues/managing_issues/#closing-issues-automatically)
-* [Enable merge request approvals](https://docs.gitlab.com/user/project/merge_requests/approvals/)
-* [Set auto-merge](https://docs.gitlab.com/user/project/merge_requests/auto_merge/)
-
-## Test and Deploy
-
-Use the built-in continuous integration in GitLab.
-
-* [Get started with GitLab CI/CD](https://docs.gitlab.com/ci/quick_start/)
-* [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/user/application_security/sast/)
-* [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/topics/autodevops/requirements/)
-* [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/user/clusters/agent/)
-* [Set up protected environments](https://docs.gitlab.com/ci/environments/protected_environments/)
-
-***
-
-# Editing this README
-
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
-
-## Suggestions for a good README
-
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
-
-## Name
-Choose a self-explaining name for your project.
-
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
-
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
-
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
+This is a collection of helper classes for using the ArduinoHA integration. They were specifically created for the internship at Wildau Robotic Lab.
 
 ## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
+
+Add [https://github.com/TrueJole/showroom-wall-tools.git](https://github.com/TrueJole/showroom-wall-tools.git) to your `platformio.ini` file under `lib_depends = `.
 
 ## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
 
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
+### Simulation.h
 
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
+Allows the ESP to recieve simulated events from the HomeAssistant Dashboard.
 
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
+```c++
+#include <Arduino.h>
+#include <ArduinoHA.h>
+#include <WiFi.h>
 
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
+// Import the Simulation library
+#include <Simulation.h>
 
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
+WiFiClient network;
+HADevice device("my-esp");
+HAMqtt mqtt(network, device);
 
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
+// Create the Simulation object and give the mqtt object as a parameter
+Simulation simulation(&mqtt);
 
-## License
-For open source projects, say how it is licensed.
+void onMqttMessage(const char *topic, const uint8_t *payload, uint16_t length) {
+	// When recieving a message, forward it to the simulation object
+	simulation.handleSimulation(topic, payload, length);
+}
 
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+void onMqttConnected() {
+	// Subcribe to the simulation topics every time the esp connects to the broker
+	simulation.simulationSetup();
+}
+
+void setup() {
+	Serial.begin(115200);
+	
+	WiFi.mode(WIFI_STA);
+	WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+	Serial.print("ESP - Connecting to Wi-Fi");
+	while (WiFi.status() != WL_CONNECTED) {
+		delay(500);
+		Serial.print(".");
+	}
+	Serial.println("");
+	
+	// Register the callbacks with the mqtt object
+	mqtt.onConnected(onMqttConnected);
+	mqtt.onMessage(onMqttMessage);
+	
+	mqtt.begin(MQTT_BROKER_ADRRESS, MQTT_USERNAME, MQTT_PASSWORD);
+}
+
+void loop() {
+	mqtt.loop();
+	
+	// Check if a simulated event is ON
+	if (simulation.checkStatus(SIM_WINTER)) {
+		Serial.print("Its been winter for ");
+		
+		// Get the time since the last event change (ON or OFF)
+		Serial.print(simulation.checkDuration(SIM_WINTER));
+		Serial.println(" milliseconds!");
+	}
+	delay(1000);
+}
+```
+
+### Lamp
+
+Easy setup and handling of Lamps directly to HomeAssistant. Works with Neopixel LEDs.
+
+```c++
+#include <Lamp.h>
+
+#define LED_PIN 6
+#define NUMBER_OF_LEDS 3
+Lamp lamp("Lamp name for HA", "unique-lamp-id", LED_PIN, NUMBER_OF_LEDS);
+
+void setup() {
+	// Initialise the lamp (required)
+	lamp.begin();
+	
+	// Manually change the lamp color and brightness (optional)
+	lamp.setColor(255, 255, 255);
+	lamp.setBrightness(100);
+}
+```
+
+### Cover
+
+*WIP*
+Easy setup and handling of a servo motor acting as any kind of HomeAssistant Cover (blinds, windows, doors, ...).
+
+```c++
+#include <Cover.h>
+
+#define SERVO_PIN 6
+#define IS_OPEN_AT_PROGRAM_START true
+Cover cover("Cover name for HA", "unique-cover-id", SERVO_PIN, IS_OPEN_AT_PROGRAM_START);
+
+void setup() {
+	// Manually open and close
+	cover.open();
+	delay(5000);
+	cover.close();
+	
+	// get the state, true is open
+	cover.getState();
+}
+```
+
+### Fan
+
+A helper class for HVAC without any HA integration. Allows controlling a fan.
+
+```c++
+#include <Fan.h>
+
+#define FAN_PIN 6
+Fan fan(FAN_PIN);
+
+void setup() {
+	// Set the fan speed (0-100)
+	fan.setSpeed(100);
+	
+	// turn the fan on (true) and off (false)
+	fan.turnOnOff(true);
+	fan.turnOnOff(false);
+}
+```
+
+### HVAC
+
+Uses a fan and LEDs to simulate an air conditioning / heating unit. Easy integration in HomeAssistant.
+
+```c++
+#include <HVAC.h>
+
+#define FAN_PIN 6
+#define LED_PIN 6
+#define NUMBER_OF_LEDS 3
+
+HVAC hvac("HVAC name for HA", "unique-hvac-id", NUMBER_OF_LEDS, LED_PIN, FAN_PIN);
+
+void onMqttConnectedToBroker() {
+	// Workaround for a bug with ArduinoHA
+	// Set the target temperature once when connecting to the broker
+	// to be able to change it in the HomeAssistant dashboard
+	hvac.setTargetTemperature((u8_t)24);
+}
+
+void setup() {
+	// Initialise the HVAC (required)
+	hvac.begin();
+	
+	// Manually setting the target temperature in Celsius
+	hvac.setTargetTemperature(24);
+	
+	// Setting the current temperature (for example from a thermometer)
+	hvac.setCurrentTemperature(20);
+	
+	// Manually set the mode
+	hvac.setMode(HAHVAC::OFF_MODE);
+}
+
+void loop() {
+	// call loop regulary to animate the led and allow the auto mode to work
+	hvac.loop();
+}
+```
