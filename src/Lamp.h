@@ -5,6 +5,18 @@
 
 class Lamp {
   public:
+    void turnOnOff(bool state) {
+      Serial.print("Lamp - State: ");
+      Serial.println(state);
+
+      if (state) {
+        onRGBColorCommand(actor.getCurrentRGBColor(), sender);
+      } else {
+        actor.setColor(0, 0, 0);
+      }
+      actor.setState(state);
+    }
+
     void begin() {
       led.begin();
       led.clear();
