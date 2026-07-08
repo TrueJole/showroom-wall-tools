@@ -5,10 +5,18 @@
 
 class Lamp {
   public:
+    void getState() {
+      return isOn;
+    }
+
+    void turnSwitch() {
+      turnOnOff(!isOn);
+    }
+
     void turnOnOff(bool state) {
       Serial.print("Lamp - State: ");
       Serial.println(state);
-
+      isOn = state;
       if (state) {
         onRGBColorCommand(actor.getCurrentRGBColor(), sender);
       } else {
@@ -51,6 +59,7 @@ class Lamp {
     
     HALight actor;
     Adafruit_NeoPixel led;
+    bool isOn = false;
 
     inline static std::unordered_map<HALight*, Lamp*> lamps;
 
@@ -62,12 +71,7 @@ class Lamp {
       Serial.print("Lamp - State: ");
       Serial.println(state);
 
-      if (state == true) {
-        onRGBColorCommand(sender->getCurrentRGBColor(), sender);
-      } else {
-        lamps[sender]->setColor(0, 0, 0);
-      }
-      sender->setState(state);
+      lamps[sender]->turnOnOff(state);
     }
     
     static void onBrightnessCommand(uint8_t brightness, HALight *sender) {
