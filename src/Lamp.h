@@ -14,7 +14,7 @@ class Lamp {
     void setColor(u8_t r, u8_t g, u8_t b) {
       led.fill(led.Color(r, g, b));
       led.show();
-      actor.setCurrentRGBColor({r, g, b});
+      actor.setRGBColor({r, g, b});
     }
 
     void setBrightness(uint8_t brightness) {
@@ -22,14 +22,12 @@ class Lamp {
       led.show();
       actor.setBrightness(brightness);
     }
-//HADevice* device, 
+
     Lamp(const char* name, const char* id, int pin, int numberOfLEDs)
         : actor(id, HALight::BrightnessFeature | HALight::RGBFeature),
           led(numberOfLEDs, pin, NEO_GRB + NEO_KHZ800) 
       {
         lamps[&actor] = this;
-
-        
 
         actor.setName(name);
         actor.onStateCommand(onStateCommand);
@@ -57,7 +55,7 @@ class Lamp {
       } else {
         lamps[sender]->setColor(0, 0, 0);
       }
-      sender->setState(state); // report state back to the Home Assistant
+      sender->setState(state);
     }
     
     static void onBrightnessCommand(uint8_t brightness, HALight *sender) {
