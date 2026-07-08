@@ -18,9 +18,10 @@ class Lamp {
       Serial.println(state);
       isOn = state;
       if (state) {
-        onRGBColorCommand(actor.getCurrentRGBColor(), actor);
+        setColor(actor.getCurrentRGBColor().red, actor.getCurrentRGBColor().green, actor.getCurrentRGBColor().blue);
       } else {
-        setColor(0, 0, 0);
+        led.fill(led.Color(0, 0, 0));
+        led.show();
       }
       actor.setState(state);
     }
