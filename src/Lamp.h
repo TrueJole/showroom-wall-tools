@@ -5,7 +5,7 @@
 
 class Lamp {
   public:
-    void getState() {
+    bool getState() {
       return isOn;
     }
 
@@ -18,9 +18,9 @@ class Lamp {
       Serial.println(state);
       isOn = state;
       if (state) {
-        onRGBColorCommand(actor.getCurrentRGBColor(), sender);
+        onRGBColorCommand(actor.getCurrentRGBColor(), actor);
       } else {
-        actor.setColor(0, 0, 0);
+        setColor(0, 0, 0);
       }
       actor.setState(state);
     }
