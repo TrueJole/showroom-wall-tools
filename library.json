@@ -18,7 +18,8 @@
     "dawidchyrzynski/home-assistant-integration": "2.1.0",
     "adafruit/Adafruit NeoPixel": "1.15.5",
     "madhephaestus/ESP32Servo": "3.2.1",
-    "adafruit/DHT sensor library": "1.4.7"
+    "adafruit/DHT sensor library": "1.4.7",
+    "maizy/JC_Button_ESP": "2.0.2"
   },
   "frameworks": "arduino",
   "platforms": "*"
