@@ -1,6 +1,6 @@
 {
   "name": "Showroom Wall Tools",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "description": "A list of wrappers and helper classes to unify the code of multiple ESP32s for an internship.",
   "repository":
   {
