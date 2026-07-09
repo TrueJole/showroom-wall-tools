@@ -50,12 +50,12 @@ class Button2 {
       return false;
     }
 
-    Button2(const char* name, const char* id, int pin, bool pullUp)
+    Button2(const char* name, const char* id, int pin, bool pullUp, char* device_class = "connectivity")
       : actor(id),
         JCbutton(pin, 25UL, 1U, pullUp)
     {
       actor.setName(name);
-      actor.setDeviceClass("plug");
+      actor.setDeviceClass(device_class);
       JCbutton.begin();
     }
 
