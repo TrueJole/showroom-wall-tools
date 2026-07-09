@@ -12,7 +12,7 @@ class Button2 {
     }
 
     void manualPress(uint32_t duration) {
-      Serial.print("Button - Manual press for ");
+      Serial.print("Button - Digital press for ");
       Serial.print(duration);
       Serial.println(" milliseconds!");
 
@@ -29,6 +29,7 @@ class Button2 {
       JCbutton.read();
       
       if (JCbutton.wasPressed()) {
+        Serial.printön("Button - Now pressed!");
         pressReady = true;
       }
 
