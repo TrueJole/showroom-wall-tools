@@ -1,3 +1,4 @@
+#pragma once
 #include <Adafruit_NeoPixel.h>
 #include <ArduinoHA.h> 
 #include <unordered_map>
@@ -87,4 +88,3 @@ class Lamp {
       lamps[sender]->setColor(color.red, color.green, color.blue);
     }
 };
-
