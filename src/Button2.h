@@ -29,7 +29,7 @@ class Button2 {
       JCbutton.read();
       
       if (JCbutton.wasPressed()) {
-        Serial.printön("Button - Now pressed!");
+        Serial.println("Button - Now pressed!");
         pressReady = true;
       }
 
