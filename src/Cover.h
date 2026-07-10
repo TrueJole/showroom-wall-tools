@@ -3,13 +3,13 @@
 #include <ESP32Servo.h>
 
 class Cover {
-  enum MotorType {
-    TYPE_SERVO,
-    TYPE_NO_LIMIT,
-    TYPES_LENGTH
-  };
-
   public:
+    enum MotorType {
+      TYPE_SERVO,
+      TYPE_NO_LIMIT,
+      TYPES_LENGTH
+    };
+    
     void setSpeed(u8_t speed_) {
       speed = min(90, max(1,speed));
     }
@@ -55,7 +55,6 @@ class Cover {
         Serial.println("Covers - Already Open");
         actor.setState(HACover::StateOpen);
       }
-      
     } 
 
     void close() {
