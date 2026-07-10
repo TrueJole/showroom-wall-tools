@@ -3,6 +3,11 @@
 
 class Alarm {
   public:
+    void overrideSequence(void(*sequence_)(Alarm *alarm)) {
+      Serial.println("Alaram - Sequence overridden!");
+      sequence = sequence_;
+    }
+
     void setFrequency(u64_t frequency_) {
       frequency = frequency_;
     }
@@ -18,7 +23,7 @@ class Alarm {
         digitalWrite(pin, HIGH);
         delayMicroseconds(1.0 / frequency_ * 1000000);
         digitalWrite(pin, LOW);
-        delayMicroseconds(1.0 / frequency_ * 1000000);
+        delayMicroseconds(50);
       }
       lastChangeTimestamp = millis();
       actor.setState(isOn);
@@ -27,6 +32,11 @@ class Alarm {
     void loop() {
       if (!isOn) {
         digitalWrite(pin, LOW);
+        return;
+      }
+      if (sequence != nullptr) {
+        Serial.println("Alaram -  Playing sequence...");
+        sequence(this);
         return;
       }
       if (pause) {
@@ -41,7 +51,7 @@ class Alarm {
           digitalWrite(pin, HIGH);
           delayMicroseconds(1.0 / frequency * 1000000);
           digitalWrite(pin, LOW);
-          delayMicroseconds(1.0 / frequency * 1000000);
+          delayMicroseconds(50);
         }
         pause = true;
         lastChangeTimestamp = millis();
@@ -73,7 +83,6 @@ class Alarm {
     }
 
   private:
-    
     HASwitch actor;
     int pin;
     bool isOn = false;
@@ -81,6 +90,7 @@ class Alarm {
     unsigned long duration;
     unsigned long frequency;
     unsigned long lastChangeTimestamp = 0;
+    void(*sequence)(Alarm *alarm);
 
     inline static std::unordered_map<HASwitch*, Alarm*> alarmMap;
 
@@ -88,4 +98,3 @@ class Alarm {
       alarmMap[sender]->turnOnOff(state);
     }
 };
-
