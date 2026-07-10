@@ -3,8 +3,30 @@
 
 class Alarm {
   public:
+    void setFrequency(u64_t frequency_) {
+      frequency = frequency_;
+    }
+    void setDuration(u64_t duration_) {
+      duration = duration_;
+    }
+
+    void playManually(u64_t frequency_, u64_t duration_) {
+      Serial.println("Alarm - Played manually!");
+      lastChangeTimestamp = millis();
+      actor.setState(true);
+      while (millis() - lastChangeTimestamp < duration_) {
+        digitalWrite(pin, HIGH);
+        delayMicroseconds(1.0 / frequency_ * 1000000);
+        digitalWrite(pin, LOW);
+        delayMicroseconds(1.0 / frequency_ * 1000000);
+      }
+      lastChangeTimestamp = millis();
+      actor.setState(isOn);
+    }
+
     void loop() {
       if (!isOn) {
+        digitalWrite(pin, LOW);
         return;
       }
       if (pause) {
@@ -47,6 +69,7 @@ class Alarm {
       frequency = frequency_;
       duration = duration_;
       pinMode(pin, OUTPUT);
+      digitalWrite(pin, LOW);
     }
 
   private:
