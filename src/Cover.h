@@ -3,7 +3,32 @@
 #include <ESP32Servo.h>
 
 class Cover {
+  enum MotorType {
+    TYPE_SERVO,
+    TYPE_NO_LIMIT,
+    TYPES_LENGTH
+  };
+
   public:
+    void setSpeed(u8_t speed_) {
+      speed = min(90, max(1,speed));
+    }
+
+    void setDuration(u64_t duration_) {
+      duration = duration_;
+    }
+
+    void setState(bool isOpen_) {
+      isOpen = isOpen_;
+      if (isOpen) actor.setState(HACover::StateOpen, true);
+      else actor.setState(HACover::StateClosed, true);
+    }
+
+    void setAngles(int openAngle_, int closedAngle_) {
+      openAngle = openAngle_;
+      closedAngle = closedAngle_;
+    }
+
     bool getState() {
       return isOpen;
     }
@@ -14,9 +39,16 @@ class Cover {
         Serial.println("Covers - Open");
         actor.setState(HACover::StateOpening); // report state back to the HA
 
-        motor.write(180);
-        delay(2000);
-        motor.write(90);
+        if (type == TYPE_NO_LIMIT) {
+          motor.write(90 + speed);
+          delay(duration);
+          motor.write(90);
+        }
+        else if (type == TYPE_SERVO) {
+          motor.write(openAngle);
+          delay(500);
+        }
+        
         actor.setState(HACover::StateOpen);
       } 
       else {
@@ -31,9 +63,15 @@ class Cover {
         isOpen = false;
         Serial.println("Covers - Close");
         actor.setState(HACover::StateClosing); // report state back to the HA
-        motor.write(0);
-        delay(2000);
-        motor.write(90);
+        if (type == TYPE_NO_LIMIT) {
+          motor.write(90 - speed);
+          delay(duration);
+          motor.write(90);
+        }
+        else if (type == TYPE_SERVO) {
+          motor.write(closedAngle);
+          delay(500);
+        }
         actor.setState(HACover::StateClosed);
       } 
       else {
@@ -42,20 +80,16 @@ class Cover {
       }
     } 
 
-    Cover(const char* name, const char* id, int pin, bool isOpen_)
-        : actor(id)
-      {
-        coversMap[&actor] = this;
+    Cover(const char* name, const char* id, int pin, MotorType type_)
+      : actor(id)
+    {
+      coversMap[&actor] = this;
 
-        actor.setName(name);
-        actor.onCommand(onCoversCommand);
-        motor.attach(pin);
-	      motor.write(90);
+      actor.setName(name);
+      actor.onCommand(onCoversCommand);
+      motor.attach(pin);
 
-        isOpen = isOpen_;
-        if (isOpen) actor.setState(HACover::StateOpen, true);
-        else actor.setState(HACover::StateClosed, true);
-        
+      type = type_;        
     }
 
   private:
@@ -63,6 +97,13 @@ class Cover {
     HACover actor;
     Servo motor;
     bool isOpen;
+    MotorType type;
+    // No Limit Motor
+    u8_t speed = 90;
+    u64_t duration = 2000;
+    // Servo Motor
+    int openAngle = 0;
+    int closedAngle = 180;
 
     inline static std::unordered_map<HACover*, Cover*> coversMap;
 
