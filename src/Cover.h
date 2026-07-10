@@ -9,8 +9,8 @@ class Cover {
       TYPE_NO_LIMIT,
       TYPES_LENGTH
     };
-    
-    void setSpeed(u8_t speed_) {
+
+    void setSpeed(int speed_) {
       speed = min(90, max(1,speed));
     }
 
@@ -98,7 +98,7 @@ class Cover {
     bool isOpen;
     MotorType type;
     // No Limit Motor
-    u8_t speed = 90;
+    int speed = 90;
     u64_t duration = 2000;
     // Servo Motor
     int openAngle = 0;
