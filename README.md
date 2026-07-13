@@ -71,7 +71,7 @@ void loop() {
 }
 ```
 
-### Lamp
+### Lamp.h
 
 Easy setup and handling of Lamps directly to HomeAssistant. Works with Neopixel LEDs.
 
@@ -89,22 +89,48 @@ void setup() {
 	// Manually change the lamp color and brightness (optional)
 	lamp.setColor(255, 255, 255);
 	lamp.setBrightness(100);
+	
+	// Manually changing the on/off state (on = true)
+	lamp.turnOnOff(true);
+	
+	// Switch the on/off state
+	lamp.turnSwitch();
+	
+	// Get the lamp state
+	lamp.getState();
 }
 ```
 
-### Cover
+### Cover.h
 
-*WIP*
 Easy setup and handling of a servo motor acting as any kind of HomeAssistant Cover (blinds, windows, doors, ...).
 
 ```c++
 #include <Cover.h>
 
 #define SERVO_PIN 6
-#define IS_OPEN_AT_PROGRAM_START true
-Cover cover("Cover name for HA", "unique-cover-id", SERVO_PIN, IS_OPEN_AT_PROGRAM_START);
+
+// What kind of motor the cover uses
+#define CONTINOUS_MOTOR_TYPE Cover::TYPE_NO_LIMIT
+#define SERVO_MOTOR_TYPE Cover::TYPE_SERVO
+
+Cover cover("Cover name for HA", "unique-cover-id", SERVO_PIN, TYPE_SERVO);
 
 void setup() {
+	// Configure the cover for TYPE_NO_LIMIT
+	// Set duration of motor run time
+	cover.setDuration(2000);
+	// Set absolute speed (max 90)
+	cover.setSpeed(90);
+	
+	// Configure the cover for TYPE_SERVO
+	#define OPEN_ANGLE 180
+	#define CLOSE_ANGLE 0
+	cover.setAngles(OPEN_ANGLE, CLOSE_ANGLE);
+	
+	// Set the HA state without activating the motor
+	covor.setState(true);
+
 	// Manually open and close
 	cover.open();
 	delay(5000);
@@ -115,7 +141,7 @@ void setup() {
 }
 ```
 
-### Fan
+### Fan.h
 
 A helper class for HVAC without any HA integration. Allows controlling a fan.
 
@@ -135,7 +161,7 @@ void setup() {
 }
 ```
 
-### HVAC
+### HVAC.h
 
 Uses a fan and LEDs to simulate an air conditioning / heating unit. Easy integration in HomeAssistant.
 
@@ -172,5 +198,91 @@ void setup() {
 void loop() {
 	// call loop regulary to animate the led and allow the auto mode to work
 	hvac.loop();
+}
+```
+
+### Button2.h
+(Button.h is used for manual control without HA integration only and is deprecated)
+Connects a button to HomeAssistant.
+
+```c++
+#include <Button2.h>
+
+#define BUTTON_PIN 6
+
+// define how the button is connected to the board (pull up = true, pull down = false)
+#define PULLUP_BUTTON true
+
+// optionally set the device class tp change the way the button is displayed in HA
+// default is "connectivity"
+#define DEVICE_CLASS "plug"
+
+Button2 button("Button name for HA", "unique-button-id", BUTTON_PIN, PULLUP_BUTTON, DEVICE_CLASS);
+
+void setup() {
+	// Check if the button is currently pressed
+	button.isPressed();
+	
+	// Manually imitate a button press
+	#define DURATION 1000
+	button.manualPress(DURATION);
+	
+	// Check if the button was pressed at any time since the last call
+	button.handlePress();
+}
+
+void loop() {
+	// Call this as often as possible
+	button.loop();
+}
+```
+
+### Alarm.h
+Use a buzzer to playback sounds. Connects to HomeAssistant.
+
+```c++
+#include <Alarm.h>
+
+#define BUZZER_PIN 6
+
+// optionally define a default frequency to use
+#define DEFAULT_FREQUENCY 3000
+
+// optionally define a default duration to use
+// the buzzer will always play for this duration, then pause for this duration
+#define DEFAULT_DURATION 500
+
+Alarm myAlarm("Alarm name for HA", "unique-alarm-id", BUZZER_PIN, DEFAULT_FREQUENCY, DEFAULT_DURATION);
+
+void mySequence(Alarm *alarm) {
+	// In the overidden sequence, you may use different lengths and frequencies
+	// Keep in mind that a long manual sequence will block other parts of your code
+	alarm->playManually(2637, 500);
+	delay(50);
+	alarm->playManually(2093, 1100);
+	delay(200);
+};
+
+void setup() {
+	// Change the default frequency
+	myAlarm.setFrequency(DEFAULT_FREQUENCY);
+	
+	// Change the default duration
+	myAlarm.setDuration(DEFAULT_DURATION);
+	
+	// Manually play a certain frequency for a certain duration
+	myAlarm.playManually(DEFAULT_FREQUENCY, DEFAULT_DURATION);
+	
+	// Manually turn the alarm on (true) or off (false)
+	myAlarm.turnOnOff(true);
+	
+	// Override the default playback sequence with a function pointer
+	// This will be contiously called instead when the alarm is on
+	myAlarm.overrideSequence(mySequence);
+}
+
+void loop() {
+	// Call this as often as possible
+	myAlarm.loop();
 }
 ```
