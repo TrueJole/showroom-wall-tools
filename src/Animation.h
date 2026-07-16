@@ -23,6 +23,10 @@ class Display {
     : display(SCREEN_WIDTH, SCREEN_HEIGHT, OLED_MOSI, OLED_CLK, OLED_DC, OLED_RESET, OLED_CS)
     {};
 
+    void drawPixel(int16_t x, int16_t y, uint16_t color) {
+        display.drawPixel(x, y, color);
+    }
+
     //normal setup
     void animationSetup(uint8_t rotation = 0) {
         // SSD1306_SWITCHCAPVCC = generate display voltage from 3.3V internally
