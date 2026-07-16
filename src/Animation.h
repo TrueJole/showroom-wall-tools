@@ -73,7 +73,7 @@ class Display {
         play = true;
     }
 
-    void displayLoop() {
+    void displayLoopBegin() {
         if (play && millis() - timestamp >= duration) {
             frameCounter++;
             if (frameCounter > endFrame) {
@@ -83,6 +83,13 @@ class Display {
             display.clearDisplay(); // Clear the display buffer
             display.setRotation(rotation);
             display.drawBitmap(0, 0, &bitmap[frameCounter * numberData], spriteWidth, spriteHeight, color);
+            endLoop = true;
+        }
+    } 
+
+    void displayLoopEnd() {
+        if (endLoop) {
+            endLoop = false;
             display.display();
         }
     } 
@@ -103,6 +110,7 @@ class Display {
         int spriteHeight;
         uint8_t color;
         bool play = false;
+        bool endLoop = false;
 
         int frameCounter;
 };
