@@ -288,7 +288,6 @@ void loop() {
 ```
 
 ### Animation.h
-WIP
 Used to display bitmaps on an Adafruit SSD1306 Display. Also contains the ability to animate snowflakes.
 ```c++
 #include <Animation.h>
@@ -301,7 +300,6 @@ Used to display bitmaps on an Adafruit SSD1306 Display. Also contains the abilit
 #define DATA_PIN 4
 
 #define BYTES_PER_BITMAP 1024
-#define END_FRAME 1024
 #define BITMAP_WIDTH 64
 #define BITMAP_HEIGHT 128
 #define DISPLAY_COLOR SSD1306_WHITE
@@ -311,24 +309,35 @@ Display display;
 const unsigned char bitmaps [5][BYTES_PER_BITMAP] = {{...}, ...};
 
 void setup() {
+	// Initialise the display (required)
+	display.animationSetup(bitmaps[0], DISPLAY_COLOR, DISPLAY_ROTATION, BITMAP_WIDTH, BITMAP_HEIGHT, BYTES_PER_BITMAP);
+	
+	// Alternative minimal setup
 	display.animationSetup(DISPLAY_ROTATION);
 	
+	// Manually change the configuration
+	display.setColor(DISPLAY_COLOR);
+	display.setBitmap(bitmaps[0], BITMAP_WIDTH, BITMAP_HEIGHT, BYTES_PER_BITMAP);
+	display.setRotation(DISPLAY_ROTATION);
+	
 	// Display a single image
-	int START_FRAME = 0;
-	int END_FRAME = 0;
-	int FPS = 1;
-  	display.drawAnimation(bitmaps[0], FPS, START_FRAME, END_FRAME, BYTES_PER_BITMAP, DISPLAY_COLOR, DISPLAY_ROTATION, BITMAP_WIDTH, BITMAP_HEIGHT);
+	int INDEX = 0;
+  	display.drawImage(INDEX);
   	
   	// Display an animation
   	int START_FRAME = 1;
 	int END_FRAME =4;
 	int FPS = 5;
-  	display.drawAnimation(bitmaps[0], FPS, START_FRAME, END_FRAME, BYTES_PER_BITMAP, DISPLAY_COLOR, DISPLAY_ROTATION, BITMAP_WIDTH, BITMAP_HEIGHT);
+  	display.drawAnimation(START_FRAME, END_FRAME, FPS);
   	
-  	// Call this once to enable snowflakes
+  	// Pause and resume the animation and snowflakes (optional)
+  	display.setPlay(false);
+  	display.setPlay(true);
+  	
+  	// Call this to enable snowflakes
   	display.enableSnow();
 
-  	// Call this once to disable snowflakes
+  	// Call this to disable snowflakes
   	display.disableSnow();
 }
 
