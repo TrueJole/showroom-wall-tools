@@ -286,3 +286,54 @@ void loop() {
 	myAlarm.loop();
 }
 ```
+
+### Animation.h
+WIP
+Used to display bitmaps on an Adafruit SSD1306 Display. Also contains the ability to animate snowflakes.
+```c++
+#include <Animation.h>
+
+// Currently, pins are predefined in the library and cannot be changed
+#define CS_PIN 7
+#define RST_PIN 0
+#define DC_PIN 6
+#define CLK_PIN 5
+#define DATA_PIN 4
+
+#define BYTES_PER_BITMAP 1024
+#define END_FRAME 1024
+#define BITMAP_WIDTH 64
+#define BITMAP_HEIGHT 128
+#define DISPLAY_COLOR SSD1306_WHITE
+#define DISPLAY_ROTATION 1
+
+Display display;
+const unsigned char bitmaps [5][BYTES_PER_BITMAP] = {{...}, ...};
+
+void setup() {
+	display.animationSetup(DISPLAY_ROTATION);
+	
+	// Display a single image
+	int START_FRAME = 0;
+	int END_FRAME = 0;
+	int FPS = 1;
+  	display.drawAnimation(bitmaps[0], FPS, START_FRAME, END_FRAME, BYTES_PER_BITMAP, DISPLAY_COLOR, DISPLAY_ROTATION, BITMAP_WIDTH, BITMAP_HEIGHT);
+  	
+  	// Display an animation
+  	int START_FRAME = 1;
+	int END_FRAME =4;
+	int FPS = 5;
+  	display.drawAnimation(bitmaps[0], FPS, START_FRAME, END_FRAME, BYTES_PER_BITMAP, DISPLAY_COLOR, DISPLAY_ROTATION, BITMAP_WIDTH, BITMAP_HEIGHT);
+  	
+  	// Call this once to enable snowflakes
+  	display.enableSnow();
+
+  	// Call this once to disable snowflakes
+  	display.disableSnow();
+}
+
+void loop() {
+	// Call this as often as possible
+	display.loop();
+}
+```
