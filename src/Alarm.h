@@ -9,14 +9,14 @@ class Alarm {
       sequence = sequence_;
     }
 
-    void setFrequency(u64_t frequency_) {
+    void setFrequency(uint64_t frequency_) {
       frequency = frequency_;
     }
-    void setDuration(u64_t duration_) {
+    void setDuration(uint64_t duration_) {
       duration = duration_;
     }
 
-    void playManually(u64_t frequency_, u64_t duration_) {
+    void playManually(uint64_t frequency_, uint64_t duration_) {
       Serial.println("Alarm - Played manually!");
       lastChangeTimestamp = millis();
       actor.setState(true);
@@ -67,7 +67,7 @@ class Alarm {
       if (isOn) lastChangeTimestamp = millis();
     }
 
-    Alarm(const char* name, const char* id, int pin_, u64_t frequency_ = 1500, u64_t duration_ = 500)
+    Alarm(const char* name, const char* id, int pin_, uint64_t frequency_ = 1500, uint64_t duration_ = 500)
       : actor(id)
     {
       alarmMap[&actor] = this;

@@ -1,5 +1,4 @@
 #pragma once
-
 #include <Arduino.h>
 #include <SPI.h>
 #include <Wire.h>
@@ -80,7 +79,7 @@ class Display {
     void drawAnimation(const unsigned char *bitmap_, uint8_t fps, uint8_t startFrame_, uint8_t endFrame_, int numberData_, uint8_t color_, uint8_t rotation_, int spriteWidth_, int spriteHeight_) {
         frameCounter = startFrame_;
         bitmap = bitmap_;
-        duration = (u64_t) 1000 / fps;
+        duration = (uint64_t) 1000 / fps;
         startFrame = startFrame_;
         endFrame = endFrame_;
         numberData = numberData_;
@@ -112,7 +111,7 @@ class Display {
     
     private:
         Adafruit_SSD1306 display;
-        u64_t timestamp;
+        uint64_t timestamp;
 
         uint8_t startFrame;
         uint8_t endFrame;

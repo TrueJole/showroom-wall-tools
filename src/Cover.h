@@ -15,7 +15,7 @@ class Cover {
       speed = min(90, max(1,speed));
     }
 
-    void setDuration(u64_t duration_) {
+    void setDuration(uint64_t duration_) {
       duration = duration_;
     }
 
@@ -100,7 +100,7 @@ class Cover {
     MotorType type;
     // No Limit Motor
     int speed = 90;
-    u64_t duration = 2000;
+    uint64_t duration = 2000;
     // Servo Motor
     int openAngle = 0;
     int closedAngle = 180;
