@@ -1,3 +1,4 @@
+#pragma once
 #include <Arduino.h>
 
 class Fan {
@@ -5,7 +6,7 @@ class Fan {
     void setSpeed(u8_t speedPercent) {
       Serial.print("Fan - set speed: ");
       Serial.println(speedPercent);
-      currentSpeedPercent = speedPercent;
+      currentSpeedPercent = min(100, max(0, speedPercent));
       if (isOn) {
         analogWrite(pin, 255 * currentSpeedPercent / 100);
       }
