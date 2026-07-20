@@ -1,3 +1,5 @@
+// DEPRACATED
+#pragma once
 #include <Arduino.h>
 #include <Lamp.h>
 

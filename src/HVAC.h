@@ -1,3 +1,4 @@
+#pragma once
 #include <ArduinoHA.h> 
 #include <Arduino.h>
 #include <unordered_map>
@@ -108,8 +109,6 @@ class HVAC {
         actor.setMinTemp(10);
         actor.setMaxTemp(30);
         actor.setTempStep(1);
-
-        
       }
 
   private:
@@ -164,4 +163,3 @@ class HVAC {
     sender->setTargetTemperature(temperature); // report target temperature back to the HA panel
 }
 };
-
