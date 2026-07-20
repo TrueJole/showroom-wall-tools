@@ -1,3 +1,4 @@
+#pragma once
 #include <ArduinoHA.h> 
 #include <unordered_map>
 #include <Arduino.h>
@@ -19,6 +20,7 @@ class Button2 {
       actor.setState(true);
       pressReady = true;
       pressed = true;
+      // delay kritisch, lieber in loop
       delay(duration);
 
       actor.setState(false);
@@ -53,7 +55,7 @@ class Button2 {
 
     Button2(const char* name, const char* id, int pin, bool pullUp, char* device_class = "connectivity")
       : actor(id),
-        JCbutton(pin, 25UL, 1U, pullUp)
+        JCbutton(pin, 25UL, pullUp, pullUp)
     {
       actor.setName(name);
       actor.setDeviceClass(device_class);
