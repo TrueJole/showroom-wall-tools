@@ -29,7 +29,7 @@ class HVAC {
         else setMode(HAHVAC::FanOnlyMode);
       }
         
-      unsigned long duration = millis() - ledAnimationStart;
+      uint64_t duration = millis() - ledAnimationStart;
       led.setBrightness(100);
       switch (ledAnimation) {
         case LED_OFF:
@@ -94,22 +94,22 @@ class HVAC {
     }
 
     HVAC(const char* name, const char* id, int ledCount_, int ledPin, int fanPin)
-        : actor(id, HAHVAC::TargetTemperatureFeature | HAHVAC::PowerFeature | HAHVAC::ModesFeature),
-          fan(fanPin),
-          led(ledCount_, ledPin, NEO_GRB + NEO_KHZ800)
-      {
-        ledCount = ledCount_;
-        hvacMap[&actor] = this;
-        
-        actor.setName(name);
+      : actor(id, HAHVAC::TargetTemperatureFeature | HAHVAC::PowerFeature | HAHVAC::ModesFeature),
+        fan(fanPin),
+        led(ledCount_, ledPin, NEO_GRB + NEO_KHZ800)
+    {
+      ledCount = ledCount_;
+      hvacMap[&actor] = this;
+      
+      actor.setName(name);
 
-        actor.onTargetTemperatureCommand(onTargetTemperatureCommand);
-        //actor.onPowerCommand(onPowerCommand);
-        actor.onModeCommand(onModeCommand);
-        actor.setMinTemp(10);
-        actor.setMaxTemp(30);
-        actor.setTempStep(1);
-      }
+      actor.onTargetTemperatureCommand(onTargetTemperatureCommand);
+      //actor.onPowerCommand(onPowerCommand);
+      actor.onModeCommand(onModeCommand);
+      actor.setMinTemp(10);
+      actor.setMaxTemp(30);
+      actor.setTempStep(1);
+    }
 
   private:
     enum LED_ANIMATION {
@@ -161,5 +161,5 @@ class HVAC {
   static void onTargetTemperatureCommand(HANumeric temperature, HAHVAC* sender) {
   	hvacMap[sender]->setTargetTemperature(temperature.toFloat());
     sender->setTargetTemperature(temperature); // report target temperature back to the HA panel
-}
+  }
 };
