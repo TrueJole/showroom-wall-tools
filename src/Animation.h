@@ -43,9 +43,12 @@ class Display {
         spriteWidth = spriteWidth_;
         spriteHeight = spriteHeight_;
         bytesPerBitmap = bytesPerBitmap_;
+        bitmapLength = sizeof(bitmap);
     }
 
     void setRotation(uint8_t rotation_) {
+        if (rotation < 0 || rotation > 3)
+            return;
         rotation = rotation_;
         display.setRotation(rotation);
     }
@@ -88,18 +91,18 @@ class Display {
 
     //draws a singular image on screen
     void drawImage(size_t index) {
-        startFrame = index;
-        endFrame = index;
+        startFrame = max((size_t) 0, min(index, bitmapLength));
+        endFrame = max((size_t) 0, min(index, bitmapLength));
         duration = (uint64_t) 1000 / 5;
         play = true;
     }
 
     //loops once throug a specified area of a bitmap, printing the images stored on screen
     void drawAnimation(size_t startFrame_, size_t endFrame_, uint64_t fps) {
-        frameCounter = startFrame_;
-        duration = (uint64_t) 1000 / fps;
-        startFrame = startFrame_;
-        endFrame = endFrame_;
+        duration = (uint64_t) 1000 / max((uint64_t) 0, min(fps, (uint64_t) 1000));
+        startFrame = max((size_t) 0, min(startFrame_, endFrame_));
+        endFrame = max((size_t) startFrame, min(endFrame_, bitmapLength));
+        frameCounter = startFrame;
         play = true;
     }
 
@@ -135,6 +138,7 @@ class Display {
         uint64_t duration = 0;
         uint8_t rotation = 0;
         const unsigned char *bitmap;
+        size_t bitmapLength = 0;
         size_t bytesPerBitmap = 1024;
         size_t spriteWidth = 64;
         size_t spriteHeight = 128;
