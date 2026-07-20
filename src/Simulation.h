@@ -5,7 +5,7 @@
 
 const char* EVENT_NAMES[] = {"simulated/winter", "simulated/night", "simulated/summer", "simulated/shower", "simulated/day"};
 
-enum class SIM_EVENTS {
+enum SIM_EVENT {
 	SIM_WINTER,
 	SIM_NIGHT,
 	SIM_SUMMER,
@@ -19,21 +19,21 @@ class Simulation {
 public:
 	Simulation(HAMqtt *mqtt_) {
 		mqtt = mqtt_;
-		for (std::size_t i = 0; i < EVENTS_LENGTH; i++) {
+		for (size_t i = 0; i < EVENTS_LENGTH; i++) {
 			eventStatus[i] = false;
 			eventStart[i] = millis();
 		}
 	}
 
-	bool checkStatus(std::size_t event) {
-		if (i > EVENTS_LENGTH-1) {
+	bool checkStatus(SIM_EVENT event) {
+		if (event > EVENTS_LENGTH-1) {
 			return false;
 		}
 		return eventStatus[event];
 	}
 
-	uint64_t checkDuration(std::size_t event) {
-		if (i > EVENTS_LENGTH-1) {
+	uint64_t checkDuration(SIM_EVENT event) {
+		if (event > EVENTS_LENGTH-1) {
 			return 0;
 		}
 		return millis() - eventStart[event];
@@ -58,7 +58,7 @@ public:
 		Serial.println((const char *)payload_data);
 
 		for (int i = 0; i < EVENTS_LENGTH; i++) {
-			if (strcmp(topic, EVENT_NAMES[i].c_str()) == 0) {
+			if (strcmp(topic, EVENT_NAMES[i]) == 0) {
 				if (strcmp(payload_data, "ON") == 0) {
 					eventStatus[i] = true;
 					eventStart[i] = millis();
