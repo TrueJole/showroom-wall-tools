@@ -1,3 +1,4 @@
+#pragma once
 #include <ArduinoHA.h> 
 #include <unordered_map>
 #include <ESP32Servo.h>
