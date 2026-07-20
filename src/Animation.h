@@ -34,10 +34,6 @@ class Display {
         snow = false;
     }
 
-    void setBytesPerBitmap(size_t bytes) {
-        bytesPerBitmap = bytes;
-    }
-
     void setColor(uint8_t color_) {
         color = color_;
     }
