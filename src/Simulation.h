@@ -1,10 +1,11 @@
+#pragma once
 #include <Arduino.h>
 #include <HAMqtt.h>
 #include <string>
 
-const char* EVENT_NAMES[] = {"winter", "night", "summer", "shower", "day"};
+const char* EVENT_NAMES[] = {"simulated/winter", "simulated/night", "simulated/summer", "simulated/shower", "simulated/day"};
 
-enum events {
+enum class SIM_EVENTS {
 	SIM_WINTER,
 	SIM_NIGHT,
 	SIM_SUMMER,
@@ -18,20 +19,29 @@ class Simulation {
 public:
 	Simulation(HAMqtt *mqtt_) {
 		mqtt = mqtt_;
+		for (std::size_t i = 0; i < EVENTS_LENGTH; i++) {
+			eventStatus[i] = false;
+			eventStart[i] = millis();
+		}
 	}
 
-	bool checkStatus(int event) {
+	bool checkStatus(std::size_t event) {
+		if (i > EVENTS_LENGTH-1) {
+			return false;
+		}
 		return eventStatus[event];
 	}
 
-	int checkDuration(int event) {
+	uint64_t checkDuration(std::size_t event) {
+		if (i > EVENTS_LENGTH-1) {
+			return 0;
+		}
 		return millis() - eventStart[event];
 	}
 
 	void simulationSetup() {
 		for (int i = 0; i < EVENTS_LENGTH; i++) {
-			std::string topic = std::string("simulated/") + EVENT_NAMES[i];
-			mqtt->subscribe(topic.c_str());
+			mqtt->subscribe(EVENT_NAMES[i]);
 		}
 		Serial.println("Simulation - Setup complete");
 	}
@@ -41,15 +51,14 @@ public:
 		Serial.print(topic);
 		Serial.print(" : ");
 
-		char payload_data[256];
+		char payload_data[length+1];
 		strncpy(payload_data, (const char *)payload, length);
 		payload_data[length] = '\0';
 
 		Serial.println((const char *)payload_data);
 
 		for (int i = 0; i < EVENTS_LENGTH; i++) {
-			std::string event = std::string("simulated/") + EVENT_NAMES[i];
-			if (strcmp(topic, event.c_str()) == 0) {
+			if (strcmp(topic, EVENT_NAMES[i].c_str()) == 0) {
 				if (strcmp(payload_data, "ON") == 0) {
 					eventStatus[i] = true;
 					eventStart[i] = millis();
@@ -66,7 +75,7 @@ public:
 
 private:
 	bool eventStatus[EVENTS_LENGTH];
-	unsigned long eventStart[EVENTS_LENGTH];
+	uint64_t eventStart[EVENTS_LENGTH];
 	HAMqtt* mqtt;
 };
 
