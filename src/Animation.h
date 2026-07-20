@@ -22,6 +22,10 @@ class Display {
     : display(SCREEN_WIDTH, SCREEN_HEIGHT, OLED_MOSI, OLED_CLK, OLED_DC, OLED_RESET, OLED_CS)
     {};
 
+    void setPlay(bool state) {
+        play = state;
+    }
+
     void enableSnow() {
         snow = true;
     }
@@ -30,36 +34,55 @@ class Display {
         snow = false;
     }
 
-    void drawPixel(int16_t x, int16_t y, uint16_t color) {
-        display.drawPixel(x, y, color);
+    void setBytesPerBitmap(size_t bytes) {
+        bytesPerBitmap = bytes;
     }
 
-    //normal setup
+    void setColor(uint8_t color_) {
+        color = color_;
+    }
+
+    void setBitmap(const unsigned char *bitmap_, size_t spriteWidth_, size_t spriteHeight_, size_t bytesPerBitmap_) {
+        bitmap = bitmap_;
+        spriteWidth = spriteWidth_;
+        spriteHeight = spriteHeight_;
+        bytesPerBitmap = bytesPerBitmap_;
+    }
+
+    void setRotation(uint8_t rotation_) {
+        rotation = rotation_;
+        display.setRotation(rotation);
+    }
+
+    //minimal setup
     void animationSetup(uint8_t rotation = 0) {
         // SSD1306_SWITCHCAPVCC = generate display voltage from 3.3V internally
         if (!display.begin(SSD1306_SWITCHCAPVCC)) {
             Serial.println("Display - Allocation failed!");
             for (;;); // Don't proceed, loop forever
         }
-        display.setRotation(rotation);
+        display.clearDisplay();
+        setRotation(rotation);
         display.display();
 
         addSnowFlakes();
 
         Serial.println("Display - Setup done!");
-
     }
 
-    //setup with capability of showing image immediatly after start
-    void animationSetup(const unsigned char *bitmap, uint8_t color, uint8_t rotation, int spriteWidth, int spriteHeight) {
+    //setup with more configuration
+    void animationSetup(const unsigned char *bitmap, uint8_t color, uint8_t rotation, size_t spriteWidth, size_t spriteHeight, size_t bytesPerBitmap_) {
         // SSD1306_SWITCHCAPVCC = generate display voltage from 3.3V internally
         if (!display.begin(SSD1306_SWITCHCAPVCC)) {
             Serial.println("Display - Allocation failed!");
             for (;;); // Don't proceed, loop forever
         }
-        display.setRotation(rotation);
+        
+        setRotation(rotation);
+        setBitmap(bitmap, spriteWidth, spriteHeight, bytesPerBitmap_);
+        setColor(color);
+
         display.clearDisplay();
-        display.drawBitmap(0, 0, bitmap, spriteWidth, spriteHeight, color);
         display.display();
 
         addSnowFlakes();
@@ -67,31 +90,25 @@ class Display {
         Serial.println("Display - Setup done!");
     }
 
-    //draws a singular image(bitmap) on screen
-    void drawImage(const unsigned char *bitmap, uint8_t color, uint8_t rotation, int spriteWidth, int spriteHeight) {
-        display.clearDisplay(); // Clear the display buffer
-        display.setRotation(rotation);
-        display.drawBitmap(0, 0, bitmap, spriteWidth, spriteHeight, color);
-        display.display();
+    //draws a singular image on screen
+    void drawImage(size_t index) {
+        startFrame = index;
+        endFrame = index;
+        duration = (uint64_t) 1000 / 5;
+        play = true;
     }
 
     //loops once throug a specified area of a bitmap, printing the images stored on screen
-    void drawAnimation(const unsigned char *bitmap_, uint8_t fps, uint8_t startFrame_, uint8_t endFrame_, int numberData_, uint8_t color_, uint8_t rotation_, int spriteWidth_, int spriteHeight_) {
+    void drawAnimation(size_t startFrame_, size_t endFrame_, uint64_t fps) {
         frameCounter = startFrame_;
-        bitmap = bitmap_;
         duration = (uint64_t) 1000 / fps;
         startFrame = startFrame_;
         endFrame = endFrame_;
-        numberData = numberData_;
-        color = color_;
-        rotation = rotation_;
-        spriteWidth = spriteWidth_;
-        spriteHeight = spriteHeight_;
         play = true;
     }
 
     void loop() {
-        if (play && millis() - timestamp >= duration) {
+        if (play && millis() - timestamp >= duration && bitmap != nullptr) {
             frameCounter++;
             if (frameCounter > endFrame) {
                 frameCounter = startFrame;
@@ -99,7 +116,7 @@ class Display {
             timestamp = millis();
             display.clearDisplay(); // Clear the display buffer
             display.setRotation(rotation);
-            display.drawBitmap(0, 0, &bitmap[frameCounter * numberData], spriteWidth, spriteHeight, color);
+            display.drawBitmap(0, 0, &bitmap[frameCounter * bytesPerBitmap], spriteWidth, spriteHeight, color);
 
             if (snow) {
                 updateSnowflakePosition();
@@ -111,40 +128,35 @@ class Display {
     
     private:
         Adafruit_SSD1306 display;
-        uint64_t timestamp;
 
-        uint8_t startFrame;
-        uint8_t endFrame;
-
-        uint8_t duration;
-        uint8_t rotation;
-        const unsigned char *bitmap;
-        int numberData;
-        int spriteWidth;
-        int spriteHeight;
-        uint8_t color;
+        uint64_t timestamp = 0;
         bool play = false;
         bool endLoop = false;
+        size_t frameCounter = 0;
 
-        int frameCounter;
-
-
+        size_t startFrame = 0;
+        size_t endFrame = 0;
+        uint64_t duration = 0;
+        uint8_t rotation = 0;
+        const unsigned char *bitmap;
+        size_t bytesPerBitmap = 1024;
+        size_t spriteWidth = 64;
+        size_t spriteHeight = 128;
+        uint8_t color = SSD1306_WHITE;
+        
         // SNOW STUFF
         bool snow = false;
+
         struct flakeCoords
         {
-            int x;
-            int y;
-            uint8_t type;
+            int x = 0;
+            int y = 0;
+            uint8_t type  = 0;
         };
 
-        const int GOAL_FLAKE_NUM = 50;
+        static const int NUMBER_OF_FLAKES = 50;
 
-        flakeCoords flakeData[50];
-
-        int totalFlakeAmount = 0;
-        int numberFlakes;
-        clock_t TARGET_TIME = 20000;
+        flakeCoords flakeData[NUMBER_OF_FLAKES];
 
         // 012345678   
         //    # #       0
@@ -166,25 +178,25 @@ class Display {
         void drawSnowFlake(int xPos, int yPos, uint8_t flakeType) {
             switch (flakeType) {
                 case 0:
-                case 5:
-                case 7:
-                case 1:   // medium snowflake, filled
+                case 1:
+                case 2:
+                case 3:   // medium snowflake, filled
                     display.drawPixel(xPos, yPos, SSD1306_INVERSE);             //    # 
                     display.drawPixel(xPos - 1, yPos + 1, SSD1306_INVERSE);     //   ###
                     display.drawPixel(xPos, yPos + 1, SSD1306_INVERSE);         //    #
                     display.drawPixel(xPos + 1, yPos + 1, SSD1306_INVERSE);     
                     display.drawPixel(xPos, yPos + 2, SSD1306_INVERSE);      
                     break;
-                case 2:
+                case 4:
+                case 5:
                 case 6:
-                case 8:
-                case 3:   // medium snowflake, empty
+                case 7:   // medium snowflake, empty
                     display.drawPixel(xPos, yPos, SSD1306_INVERSE);             //    # 
                     display.drawPixel(xPos - 1, yPos + 1, SSD1306_INVERSE);     //   # #
                     display.drawPixel(xPos + 1, yPos + 1, SSD1306_INVERSE);     //    #
                     display.drawPixel(xPos, yPos + 2, SSD1306_INVERSE);
                     break;
-                case 4:   // large snowflake
+                case 8:   // large snowflake
                     for (int i = 0; i < 28; i++) {
                         display.drawPixel(xPos + pixelOffset[i][0], yPos + pixelOffset[i][1], SSD1306_INVERSE);
                     }
@@ -194,9 +206,7 @@ class Display {
         }
 
         void addSnowFlakes() {
-            numberFlakes = 50;
-            
-            for (int j = 0; j < numberFlakes; j++) {
+            for (size_t  j = 0; j < NUMBER_OF_FLAKES; j++) {
                 flakeData[j].x = rand()%129;
                 flakeData[j].y = -rand()%64;
                 flakeData[j].type = rand()%9;
@@ -205,20 +215,19 @@ class Display {
         }
 
         void updateSnowflakePosition() {
-            for (int k = 49; k > 0; k--) {
-                int K = k - 1;
+            for (size_t k = 0; k < NUMBER_OF_FLAKES; k++) {
                 //update y
-                int flakeSpeed = rand()%7+3;
-                flakeData[K].y += flakeSpeed;
+                int32_t flakeSpeed = rand()%7+3;
+                flakeData[k].y += flakeSpeed;
                 //update x
-                int horizontalFlakeOffset = rand()%5-2;
-                flakeData[K].x += horizontalFlakeOffset;
-                if (flakeData[K].x < 0 || flakeData[K].x > 128) {
-                    flakeData[K].x -= horizontalFlakeOffset;
+                int32_t horizontalFlakeOffset = rand()%5-2;
+                flakeData[k].x += horizontalFlakeOffset;
+                if (flakeData[k].x < 0 || flakeData[k].x > 128) {
+                    flakeData[k].x -= horizontalFlakeOffset;
                 }
-                drawSnowFlake(flakeData[K].x, flakeData[K].y, flakeData[K].type);
-                    if (flakeData[K].y > 64) {
-                    flakeData[K].y = -1;
+                drawSnowFlake(flakeData[k].x, flakeData[k].y, flakeData[k].type);
+                    if (flakeData[k].y > 64) {
+                    flakeData[k].y = -1;
                 }
             }
         }
