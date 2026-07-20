@@ -91,7 +91,7 @@ class Display {
         play = true;
     }
 
-    void displayLoopBegin() {
+    void loop() {
         if (play && millis() - timestamp >= duration) {
             frameCounter++;
             if (frameCounter > endFrame) {
