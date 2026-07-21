@@ -93,6 +93,7 @@ class Display {
     void drawImage(size_t index) {
         startFrame = max((size_t) 0, min(index, bitmapLength));
         endFrame = max((size_t) 0, min(index, bitmapLength));
+        frameCounter = startFrame;
         duration = (uint64_t) 1000 / 5;
         play = true;
     }
