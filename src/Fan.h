@@ -3,10 +3,10 @@
 
 class Fan {
   public:
-    void setSpeed(u8_t speedPercent) {
+    void setSpeed(uint8_t speedPercent) {
       Serial.print("Fan - set speed: ");
       Serial.println(speedPercent);
-      currentSpeedPercent = min(100, max(0, speedPercent));
+      currentSpeedPercent = min((uint8_t) 100, max((uint8_t) 0, speedPercent));
       if (isOn) {
         analogWrite(pin, 255 * currentSpeedPercent / 100);
       }
