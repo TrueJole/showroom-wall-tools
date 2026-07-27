@@ -53,14 +53,33 @@ class Display {
     }
 
     //minimal setup
-    void animationSetup(const uint8_t rotation = 0) {
+    void animationSetup() {
         // SSD1306_SWITCHCAPVCC = generate display voltage from 3.3V internally
         if (!display.begin(SSD1306_SWITCHCAPVCC)) {
             Serial.println("Display - Allocation failed!");
             for (;;); // Don't proceed, loop forever
         }
         display.clearDisplay();
+        display.display();
+
+        addSnowFlakes();
+
+        Serial.println("Display - Setup done!");
+    }
+
+    //setup with more configuration
+    void animationSetup(const unsigned char *bitmap, const uint8_t color, const uint8_t rotation, const size_t spriteWidth, const size_t spriteHeight, const size_t bytesPerBitmap_) {
+        // SSD1306_SWITCHCAPVCC = generate display voltage from 3.3V internally
+        if (!display.begin(SSD1306_SWITCHCAPVCC)) {
+            Serial.println("Display - Allocation failed!");
+            for (;;); // Don't proceed, loop forever
+        }
+        
         setRotation(rotation);
+        setBitmap(bitmap, spriteWidth, spriteHeight, bytesPerBitmap_);
+        setColor(color);
+
+        display.clearDisplay();
         display.display();
 
         addSnowFlakes();
@@ -148,13 +167,13 @@ class Display {
         //  #  #  #     7
         //    # #       8
 
-        int pixelOffset[28][2] = {
+        const int largeSnowflake[28][2] = {
         {3, 0}, {5, 0}, {1, 1}, {4, 1}, {7, 1}, {2, 2}, {4, 2}, {6, 2}, {0, 3}, {4, 3}, {8, 3}, {1, 4}, {2, 4}, {3, 4}, {5, 4}, {6, 4}, {7, 4}, {0, 5}, {4, 5}, {8, 5}, 
         {2, 6}, {4, 6}, {6, 6}, {1, 7}, {4, 7}, {7, 7}, {3, 8}, {5, 8}
         };
 
 
-        void drawSnowFlake(int xPos, int yPos, uint8_t flakeType) {
+        void drawSnowFlake(const int xPos, const int yPos, const uint8_t flakeType) {
             switch (flakeType) {
                 case 0:
                 case 1:
@@ -177,7 +196,7 @@ class Display {
                     break;
                 case 8:   // large snowflake
                     for (int i = 0; i < 28; i++) {
-                        display.drawPixel(xPos + pixelOffset[i][0], yPos + pixelOffset[i][1], SSD1306_INVERSE);
+                        display.drawPixel(xPos + largeSnowflake[i][0], yPos + largeSnowflake[i][1], SSD1306_INVERSE);
                     }
                     break;
             }
