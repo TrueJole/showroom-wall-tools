@@ -13,7 +13,8 @@ class Button2 {
     }
 
     void manualPress(uint32_t duration) {
-      Serial.print("Button - Digital press for ");
+      Serial.print(name);
+      Serial.print(" - Digital press for ");
       Serial.print(duration);
       Serial.println(" milliseconds!");
 
@@ -31,7 +32,8 @@ class Button2 {
       JCbutton.read();
       
       if (JCbutton.wasPressed()) {
-        Serial.println("Button - Now pressed!");
+        Serial.print(name);
+        Serial.println(" - Now pressed!");
         pressReady = true;
       }
 
@@ -53,10 +55,12 @@ class Button2 {
       return false;
     }
 
-    Button2(const char* name, const char* id, int pin, bool pullUp, char* device_class = (char*) "connectivity")
+    Button2(const char* name_, const char* id, int pin, bool pullUp, char* device_class = (char*) "connectivity")
       : actor(id),
         JCbutton(pin, 25UL, pullUp, pullUp)
     {
+      name = name_;
+
       actor.setName(name);
       actor.setDeviceClass(device_class);
       JCbutton.begin();
@@ -67,4 +71,5 @@ class Button2 {
     Button JCbutton;
     bool pressReady = false;
     bool pressed = false;
+    char* name;
 };

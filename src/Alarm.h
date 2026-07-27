@@ -5,7 +5,8 @@
 class Alarm {
   public:
     void overrideSequence(void(*sequence_)(Alarm *alarm)) {
-      Serial.println("Alaram - Sequence overridden!");
+      Serial.print(name);
+      Serial.println(" - Sequence overridden!");
       sequence = sequence_;
     }
 
@@ -17,7 +18,8 @@ class Alarm {
     }
 
     void playManually(uint64_t frequency_, uint64_t duration_) {
-      Serial.println("Alarm - Played manually!");
+      Serial.print(name);
+      Serial.println(" - Played manually!");
       lastChangeTimestamp = millis();
       actor.setState(true);
       while (millis() - lastChangeTimestamp < duration_) {
@@ -36,7 +38,8 @@ class Alarm {
         return;
       }
       if (sequence != nullptr) {
-        Serial.println("Alaram -  Playing sequence...");
+        Serial.print(name);
+        Serial.println(" -  Playing sequence...");
         sequence(this);
         return;
       }
@@ -60,17 +63,19 @@ class Alarm {
     }
 
     void turnOnOff(bool state) {
-      Serial.print("Alarm - Now ");
+      Serial.print(name);
+      Serial.print(" - Now ");
       Serial.println(state);
       isOn = state;
       actor.setState(isOn);
       if (isOn) lastChangeTimestamp = millis();
     }
 
-    Alarm(const char* name, const char* id, int pin_, uint64_t frequency_ = 1500, uint64_t duration_ = 500)
+    Alarm(const char* name_, const char* id, int pin_, uint64_t frequency_ = 1500, uint64_t duration_ = 500)
       : actor(id)
     {
       alarmMap[&actor] = this;
+      name = name_;
       
       actor.setName(name);
       actor.onCommand(onAlarmCommand);
@@ -86,6 +91,7 @@ class Alarm {
   private:
     HASwitch actor;
     int pin;
+    char* name;
     bool isOn = false;
     bool pause = false;
     unsigned long duration;

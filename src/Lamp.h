@@ -15,7 +15,8 @@ class Lamp {
     }
 
     void turnOnOff(bool state) {
-      Serial.print("Lamp - State: ");
+      Serial.print(name);
+      Serial.print(" - State: ");
       Serial.println(state);
       isOn = state;
       if (state) {
@@ -45,11 +46,12 @@ class Lamp {
       actor.setBrightness(brightness);
     }
 
-    Lamp(const char* name, const char* id, int pin, int numberOfLEDs)
+    Lamp(const char* name_, const char* id, int pin, int numberOfLEDs)
         : actor(id, HALight::BrightnessFeature | HALight::RGBFeature),
           led(numberOfLEDs, pin, NEO_GRB + NEO_KHZ800) 
       {
         lamps[&actor] = this;
+        name = name_;
 
         actor.setName(name);
         actor.onStateCommand(onStateCommand);
@@ -62,6 +64,7 @@ class Lamp {
     HALight actor;
     Adafruit_NeoPixel led;
     bool isOn = false;
+    char* name;
 
     inline static std::unordered_map<HALight*, Lamp*> lamps;
 
@@ -70,14 +73,16 @@ class Lamp {
     }
 
     static void onStateCommand(bool state, HALight *sender) {
-      Serial.print("Lamp - State: ");
+      Serial.print(name);
+      Serial.print(" - State: ");
       Serial.println(state);
 
       lamps[sender]->turnOnOff(state);
     }
     
     static void onBrightnessCommand(uint8_t brightness, HALight *sender) {
-      Serial.print("Lamp - Brightness: ");
+      Serial.print(name);
+      Serial.print(" - Brightness: ");
       Serial.println(brightness);
 
       lamps[sender]->setBrightness(brightness);
