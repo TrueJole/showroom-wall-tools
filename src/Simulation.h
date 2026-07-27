@@ -15,7 +15,6 @@ enum SIM_EVENT {
 };
 
 class Simulation {
-	
 public:
 	Simulation(HAMqtt *mqtt_) {
 		mqtt = mqtt_;
@@ -25,14 +24,14 @@ public:
 		}
 	}
 
-	bool checkStatus(SIM_EVENT event) {
+	bool checkStatus(const SIM_EVENT event) {
 		if (event > EVENTS_LENGTH-1) {
 			return false;
 		}
 		return eventStatus[event];
 	}
 
-	uint64_t checkDuration(SIM_EVENT event) {
+	uint64_t checkDuration(const SIM_EVENT event) {
 		if (event > EVENTS_LENGTH-1) {
 			return 0;
 		}

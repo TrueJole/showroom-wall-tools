@@ -10,14 +10,14 @@ class Alarm {
       sequence = sequence_;
     }
 
-    void setFrequency(uint64_t frequency_) {
+    void setFrequency(const uint64_t frequency_) {
       frequency = frequency_;
     }
-    void setDuration(uint64_t duration_) {
+    void setDuration(const uint64_t duration_) {
       duration = duration_;
     }
 
-    void playManually(uint64_t frequency_, uint64_t duration_) {
+    void playManually(const uint64_t frequency_, const uint64_t duration_) {
       Serial.print(name);
       Serial.println(" - Played manually!");
       lastChangeTimestamp = millis();
@@ -62,7 +62,7 @@ class Alarm {
       }
     }
 
-    void turnOnOff(bool state) {
+    void turnOnOff(const bool state) {
       Serial.print(name);
       Serial.print(" - Now ");
       Serial.println(state);
@@ -71,8 +71,9 @@ class Alarm {
       if (isOn) lastChangeTimestamp = millis();
     }
 
-    Alarm(char* name_, const char* id, int pin_, uint64_t frequency_ = 1500, uint64_t duration_ = 500)
-      : actor(id)
+    Alarm(const char* name_, const char* id, const int pin_, const uint64_t frequency_ = 1500, const uint64_t duration_ = 500)
+      : actor(id),
+      pin(pin_)
     {
       alarmMap[&actor] = this;
       name = name_;
@@ -81,7 +82,6 @@ class Alarm {
       actor.onCommand(onAlarmCommand);
       actor.setState(false, true);
       
-      pin = pin_;
       frequency = frequency_;
       duration = duration_;
       pinMode(pin, OUTPUT);
@@ -90,8 +90,8 @@ class Alarm {
 
   private:
     HASwitch actor;
-    int pin;
-    char* name;
+    const int pin;
+    const char* name;
     bool isOn = false;
     bool pause = false;
     unsigned long duration;

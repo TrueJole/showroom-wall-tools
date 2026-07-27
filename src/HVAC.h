@@ -32,73 +32,73 @@ class HVAC {
       uint64_t duration = millis() - ledAnimationStart;
       led.setBrightness(100);
       switch (ledAnimation) {
-        case LED_OFF:
+        case LED_ANIMATION::LED_OFF:
           led.setBrightness(0);
           break;
-        case LED_COOL:
+        case LED_ANIMATION::LED_COOL:
           led.fill(led.Color(0, 150 + 40 * sin(duration*ANIMATION_SPEED), 255));
           break;
-        case LED_HEAT:
+        case LED_ANIMATION::LED_HEAT:
           led.fill(led.Color(255, 110 + 50 * sin(duration*ANIMATION_SPEED), 0));
           break;
-        case LED_DRY:
+        case LED_ANIMATION::LED_DRY:
           led.fill(led.Color(222, 214, 50));
           break;
       }
       led.show();
     }
 
-    void setMode(HAHVAC::Mode mode_) {
+    void setMode(const HAHVAC::Mode mode_) {
       if (mode != mode_) {
         mode = mode_;
         ledAnimationStart = millis();
         switch (mode) {
           case HAHVAC::OffMode:
-            ledAnimation = LED_OFF;
+            ledAnimation = LED_ANIMATION::LED_OFF;
             fan.turnOnOff(false);
             break;
           case HAHVAC::CoolMode:
-            ledAnimation = LED_COOL;
+            ledAnimation = LED_ANIMATION::LED_COOL;
             fan.turnOnOff(true);
             break;
           case HAHVAC::HeatMode:
-            ledAnimation = LED_HEAT;
+            ledAnimation = LED_ANIMATION::LED_HEAT;
             fan.turnOnOff(false);
             break;
           case HAHVAC::DryMode:
-            ledAnimation = LED_DRY;
+            ledAnimation = LED_ANIMATION::LED_DRY;
             fan.turnOnOff(true);
             break;
           case HAHVAC::FanOnlyMode:
-            ledAnimation = LED_OFF;
+            ledAnimation = LED_ANIMATION::LED_OFF;
             fan.turnOnOff(true);
             break;
           default:
-            ledAnimation = LED_OFF;
+            ledAnimation = LED_ANIMATION::LED_OFF;
             fan.turnOnOff(false);
             break;
         }
       }
     }
 
-    void setCurrentTemperature(float temperature) {
+    void setCurrentTemperature(const float temperature) {
       currentTemperature = temperature;
       actor.setCurrentTemperature(temperature);
     }
 
-    void setTargetTemperature(float temperature) {
+    void setTargetTemperature(const float temperature) {
       targetTemperature = temperature;
       actor.setTargetTemperature(temperature);
       Serial.print("HVAC - Target temperature: ");
     	Serial.println(temperature);
     }
 
-    HVAC(const char* name, const char* id, int ledCount_, int ledPin, int fanPin)
+    HVAC(const char* name, const char* id, const int ledCount_, const int ledPin, const int fanPin)
       : actor(id, HAHVAC::TargetTemperatureFeature | HAHVAC::PowerFeature | HAHVAC::ModesFeature),
         fan(fanPin),
-        led(ledCount_, ledPin, NEO_GRB + NEO_KHZ800)
+        led(ledCount_, ledPin, NEO_GRB + NEO_KHZ800),
+        ledCount(ledCount_)
     {
-      ledCount = ledCount_;
       hvacMap[&actor] = this;
       
       actor.setName(name);
@@ -112,7 +112,7 @@ class HVAC {
     }
 
   private:
-    enum LED_ANIMATION {
+    enum class LED_ANIMATION {
       LED_OFF,
       LED_COOL,
       LED_HEAT,
@@ -127,8 +127,8 @@ class HVAC {
     Fan fan;
     
     Adafruit_NeoPixel led;
-    int ledCount;
-    LED_ANIMATION ledAnimation = LED_OFF;
+    const int ledCount;
+    LED_ANIMATION ledAnimation = LED_ANIMATION::LED_OFF;
     unsigned long ledAnimationStart = 0;
 
     float targetTemperature = 0;

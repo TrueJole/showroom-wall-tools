@@ -22,7 +22,7 @@ class Display {
     : display(SCREEN_WIDTH, SCREEN_HEIGHT, OLED_MOSI, OLED_CLK, OLED_DC, OLED_RESET, OLED_CS)
     {};
 
-    void setPlay(bool state) {
+    void setPlay(const bool state) {
         play = state;
     }
 
@@ -34,18 +34,18 @@ class Display {
         snow = false;
     }
 
-    void setColor(uint8_t color_) {
+    void setColor(const uint8_t color_) {
         color = color_;
     }
 
-    void setBitmap(const unsigned char *bitmap_, size_t spriteWidth_, size_t spriteHeight_, size_t bytesPerBitmap_) {
+    void setBitmap(const unsigned char *bitmap_, const size_t spriteWidth_, const size_t spriteHeight_, const size_t bytesPerBitmap_) {
         bitmap = bitmap_;
         spriteWidth = spriteWidth_;
         spriteHeight = spriteHeight_;
         bytesPerBitmap = bytesPerBitmap_;
     }
 
-    void setRotation(uint8_t rotation_) {
+    void setRotation(const uint8_t rotation_) {
         if (rotation < 0 || rotation > 3)
             return;
         rotation = rotation_;
@@ -53,7 +53,7 @@ class Display {
     }
 
     //minimal setup
-    void animationSetup(uint8_t rotation = 0) {
+    void animationSetup(const uint8_t rotation = 0) {
         // SSD1306_SWITCHCAPVCC = generate display voltage from 3.3V internally
         if (!display.begin(SSD1306_SWITCHCAPVCC)) {
             Serial.println("Display - Allocation failed!");
@@ -61,26 +61,6 @@ class Display {
         }
         display.clearDisplay();
         setRotation(rotation);
-        display.display();
-
-        addSnowFlakes();
-
-        Serial.println("Display - Setup done!");
-    }
-
-    //setup with more configuration
-    void animationSetup(const unsigned char *bitmap, uint8_t color, uint8_t rotation, size_t spriteWidth, size_t spriteHeight, size_t bytesPerBitmap_) {
-        // SSD1306_SWITCHCAPVCC = generate display voltage from 3.3V internally
-        if (!display.begin(SSD1306_SWITCHCAPVCC)) {
-            Serial.println("Display - Allocation failed!");
-            for (;;); // Don't proceed, loop forever
-        }
-        
-        setRotation(rotation);
-        setBitmap(bitmap, spriteWidth, spriteHeight, bytesPerBitmap_);
-        setColor(color);
-
-        display.clearDisplay();
         display.display();
 
         addSnowFlakes();
@@ -89,7 +69,7 @@ class Display {
     }
 
     //draws a singular image on screen
-    void drawImage(size_t index) {
+    void drawImage(const size_t index) {
         startFrame = max((size_t) 0, index);
         endFrame = max((size_t) 0, index);
         frameCounter = startFrame;
@@ -98,7 +78,7 @@ class Display {
     }
 
     //loops once throug a specified area of a bitmap, printing the images stored on screen
-    void drawAnimation(size_t startFrame_, size_t endFrame_, uint64_t fps) {
+    void drawAnimation(const size_t startFrame_, const size_t endFrame_, const uint64_t fps) {
         duration = (uint64_t) 1000 / max((uint64_t) 0, min(fps, (uint64_t) 1000));
         startFrame = max((size_t) 0, min(startFrame_, endFrame_));
         endFrame = max((size_t) startFrame, endFrame_);
