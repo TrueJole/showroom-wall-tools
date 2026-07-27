@@ -46,7 +46,7 @@ class Lamp {
       actor.setBrightness(brightness);
     }
 
-    Lamp(const char* name_, const char* id, int pin, int numberOfLEDs)
+    Lamp(char* name_, const char* id, const int pin, const int numberOfLEDs)
         : actor(id, HALight::BrightnessFeature | HALight::RGBFeature),
           led(numberOfLEDs, pin, NEO_GRB + NEO_KHZ800) 
       {

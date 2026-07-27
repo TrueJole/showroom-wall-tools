@@ -55,7 +55,7 @@ class Button2 {
       return false;
     }
 
-    Button2(const char* name_, const char* id, int pin, bool pullUp, char* device_class = (char*) "connectivity")
+    Button2(char* name_, const char* id, const int pin, const bool pullUp, const char* device_class = "connectivity")
       : actor(id),
         JCbutton(pin, 25UL, pullUp, pullUp)
     {

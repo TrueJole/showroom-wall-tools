@@ -71,7 +71,7 @@ class Alarm {
       if (isOn) lastChangeTimestamp = millis();
     }
 
-    Alarm(const char* name_, const char* id, int pin_, uint64_t frequency_ = 1500, uint64_t duration_ = 500)
+    Alarm(char* name_, const char* id, int pin_, uint64_t frequency_ = 1500, uint64_t duration_ = 500)
       : actor(id)
     {
       alarmMap[&actor] = this;
