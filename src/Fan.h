@@ -8,17 +8,18 @@ class Fan {
       Serial.println(speedPercent);
       currentSpeedPercent = min((uint8_t) 100, max((uint8_t) 0, speedPercent));
       if (isOn) {
-        analogWrite(pin, 255 * currentSpeedPercent / 100);
+        analogWrite(pin, 255 - 255 * currentSpeedPercent / 100);
       }
     }
+
     void turnOnOff(const bool state) {
       Serial.print("Fan - state now ");
       Serial.println(state);
       isOn = state;
       if (isOn) {
-        analogWrite(pin, 255 * currentSpeedPercent / 100);
+        analogWrite(pin, 255 - 255 * currentSpeedPercent / 100);
       } else {
-        analogWrite(pin, 0);
+        analogWrite(pin, 255);
       }
     }
     
