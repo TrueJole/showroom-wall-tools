@@ -12,7 +12,7 @@ class Cover {
     };
 
     void setSpeed(const int speed_) {
-      speed = min(90, max(1,speed_));
+      speed = min(90, max(-90,speed_));
     }
 
     void setDuration(const uint64_t duration_) {
