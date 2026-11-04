@@ -5,6 +5,9 @@
 enum SENOR_TYPES {
     TEMPERATURE,
     HUMIDITY,
+    LIGHT,
+    CO2,
+    TVOC,
     TYPES_LENGTH
 }; 
 
@@ -39,9 +42,34 @@ class SensorOverride {
                     slider.setStep(1);
                     //sensor.setCurrentState(false);
                 } break;
-                default: {
-                    //foo();
-                }
+                case HUMIDITY: {
+                    slider.setUnitOfMeasurement("%");
+                    slider.setMin(0);
+                    slider.setMax(100);
+                    slider.setIcon("mdi:water-percent-alert");
+                    slider.setStep(1);
+                } break;
+                case LIGHT: {
+                    slider.setUnitOfMeasurement("lx");
+                    slider.setMin(0);
+                    slider.setMax(2000);
+                    slider.setIcon("mdi:weather-sunny-alert");
+                    slider.setStep(50);
+                } break;
+                case CO2: {
+                    slider.setUnitOfMeasurement("ppm");
+                    slider.setMin(400);
+                    slider.setMax(3000);
+                    slider.setIcon("mdi:molecule-co2");
+                    slider.setStep(100);
+                } break;
+                case TVOC: {
+                    slider.setUnitOfMeasurement("ppb");
+                    slider.setMin(0);
+                    slider.setMax(300);
+                    slider.setIcon("mdi:molecule");
+                    slider.setStep(10);
+                } break;
             };
         }
 
