@@ -1,6 +1,6 @@
 # Showroom Wall Tools
 
-This is a collection of helper classes for using the ArduinoHA integration. They were specifically created for the internship at Wildau Robotic Lab.
+This is a collection of helper classes for using the ArduinoHA integration. They were specifically created for the internship at the Telematics Robotic Lab in Wildau.
 
 ## Installation
 
